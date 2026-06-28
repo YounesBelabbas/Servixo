@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_colors.dart';
+import '../../services/data/repositories/services_providers.dart';
 
-class HomeBaseScreen extends StatelessWidget {
+class HomeBaseScreen extends ConsumerWidget {
   const HomeBaseScreen({super.key});
 
+  // دالة مساعدة لتحويل اسم الأيقونة النصي (من السيرفر) إلى IconData في فلوتر
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'bolt': return Icons.bolt;
+      case 'plumbing': return Icons.plumbing;
+      case 'cleaning_services': return Icons.cleaning_services;
+      case 'computer': return Icons.computer;
+      default: return Icons.category_outlined;
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
-    // قائمة تجريبية للتصنيفات
-    final List<Map<String, dynamic>> categories = [
-      {'icon': Icons.bolt, 'label': 'كهرباء'},
-      {'icon': Icons.plumbing, 'label': 'سباكة'},
-      {'icon': Icons.cleaning_services, 'label': 'تنظيف'},
-      {'icon': Icons.computer, 'label': 'برمجة'},
-      {'icon': Icons.format_paint, 'label': 'طلاء'},
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    // استهلاك الـ Provider الخاص بالتصنيفات
+    final categoriesAsync = ref.watch(categoriesFutureProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        automaticallyImplyLeading: false, // نزع سهم العودة الافتراضي
+        automaticallyImplyLeading: false,
         title: Row(
           children: [
             const CircleAvatar(
@@ -53,7 +60,7 @@ class HomeBaseScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. البانر الإعلاني (Promo Banner)
+            // 1. البانر الإعلاني
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -82,7 +89,7 @@ class HomeBaseScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // 2. عنوان قسم التصنيفات
+            // 2. قسم التصنيفات الرئيسية المربوط بـ Supabase
             Row(
               mainAxisAlignment: MainAxisAlignment.between,
               children: [
@@ -98,43 +105,61 @@ class HomeBaseScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // قائمة أفقية للتصنيفات
-            SizedBox(
-              height: 90,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: AppColors.primary.withOpacity(0.1),
-                          child: Icon(categories[index]['icon'], color: AppColors.primary, size: 26),
-                        ),
-                        const SizedBox(height: 😎,
-                        Text(
-                          categories[index]['label'],
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+            // استخدام الحالات الثلاث (Loading, Error, Data) الخاصة بالـ AsyncValue
+            categoriesAsync.when(
+              loading: () => const SizedBox(
+                height: 90,
+                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
               ),
+              error: (err, stack) => SizedBox(
+                height: 90,
+                child: Center(child: Text('خطأ في جلب البيانات: $err', style: const TextStyle(color: Colors.red))),
+              ),
+              data: (categoriesList) {
+                if (categoriesList.isEmpty) {
+                  return const SizedBox(
+                    height: 90,
+                    child: Center(child: Text('لا توجد تصنيفات حالياً')),
+                  );
+                }
+                return SizedBox(
+                  height: 90,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categoriesList.length,
+                    itemBuilder: (context, index) {
+                      final category = categoriesList[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 28,
+                              backgroundColor: AppColors.primary.withOpacity(0.1),
+                              child: Icon(_getIconData(category.iconName), color: AppColors.primary, size: 26),
+                            ),
+                            const SizedBox(height: 😎,
+                            Text(
+                              category.name,
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 24),
 
-            // 3. عنوان مقدمي الخدمات المقترحين
+            // 3. أعلى المحترفين تقييماً (ستبقى تجريبية ضرك حتى ننشئ جدول المحترفين)
             const Text(
               'أعلى المحترفين تقييماً',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimaryLight),
             ),
             const SizedBox(height: 12),
 
-            // كروت مقدمي الخدمات (قائمة عمودية مدمجة)
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
