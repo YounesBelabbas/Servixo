@@ -12,9 +12,8 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-
-  @override
-  void 本InitState() {
+ @override
+void initState() {
     super.initState();
     
     // إعداد الـ AnimationController للتحكم في وقت الفيد (Fade Duration)
