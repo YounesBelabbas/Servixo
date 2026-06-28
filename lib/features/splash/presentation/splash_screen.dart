@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_colors.dart';
+import '../../../app/main_navigation_screen.dart'; // تأكد من عمل import لملف الملاحة
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -12,11 +13,11 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
- @override
-void initState() {
+
+  @override
+  void initState() {
     super.initState();
     
-    // إعداد الـ AnimationController للتحكم في وقت الفيد (Fade Duration)
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -27,16 +28,16 @@ void initState() {
     );
 
     _animationController.forward();
-
-    // محاكاة وقت التهيئة والانتقال إلى الصفحة التالية (مثلاً صفحة الـ Auth لاحقاً)
     _navigateToNext();
   }
 
   Future<void> _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      // ضرك بما أننا مازال ما درناش الـ Routing الكامل لصفحة الـ Auth، نخلوها فارغة أو تطبع رسالة
-      debugPrint("Navigate to Authentication Screen");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+      );
     }
   }
 
@@ -49,20 +50,18 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight, // يتوافق مع الثيم
+      backgroundColor: AppColors.backgroundLight,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 🖼️ مكان اللوغو المطلوب في الوصف
               Image.asset(
                 'assets/images/app_logo.png',
                 width: 160,
                 height: 160,
                 errorBuilder: (context, error, stackTrace) {
-                  // إذا اللوغو مش محطوط ضرك، يعرض أيقونة افتراضية باش ما يتكراش التطبيق
                   return const Icon(
                     Icons.hive_rounded,
                     size: 100,
@@ -71,7 +70,6 @@ void initState() {
                 },
               ),
               const SizedBox(height: 24),
-              // اسم التطبيق بهوية الألوان
               const Text(
                 'SERVIXO',
                 style: TextStyle(
