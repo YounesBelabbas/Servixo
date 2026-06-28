@@ -6,7 +6,6 @@ import '../../services/data/repositories/services_providers.dart';
 class HomeBaseScreen extends ConsumerWidget {
   const HomeBaseScreen({super.key});
 
-  // دالة مساعدة لتحويل اسم الأيقونة النصي (من السيرفر) إلى IconData في فلوتر
   IconData _getIconData(String iconName) {
     switch (iconName) {
       case 'bolt': return Icons.bolt;
@@ -19,7 +18,6 @@ class HomeBaseScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // استهلاك الـ Provider الخاص بالتصنيفات
     final categoriesAsync = ref.watch(categoriesFutureProvider);
 
     return Scaffold(
@@ -35,12 +33,12 @@ class HomeBaseScreen extends ConsumerWidget {
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 Text(
-                  'مرحباً بك 👋',
+                  'Welcome',
                   style: TextStyle(fontSize: 12, color: AppColors.grey600),
                 ),
-                const Text(
+                Text(
                   'يا خويا العزيز',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimaryLight),
                 ),
@@ -79,7 +77,7 @@ class HomeBaseScreen extends ConsumerWidget {
                     'تخفيض 20% على أول خدمة!',
                     style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 😎,
+                  const SizedBox(height: 8),
                   Text(
                     'احجز الآن أفضل المحترفين في منطقتك بكل سهولة وأمان.',
                     style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13),
@@ -89,7 +87,7 @@ class HomeBaseScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // 2. قسم التصنيفات الرئيسية المربوط بـ Supabase
+            // 2. قسم التصنيفات الرئيسية
             Row(
               mainAxisAlignment: MainAxisAlignment.between,
               children: [
@@ -105,15 +103,14 @@ class HomeBaseScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
 
-            // استخدام الحالات الثلاث (Loading, Error, Data) الخاصة بالـ AsyncValue
             categoriesAsync.when(
               loading: () => const SizedBox(
                 height: 90,
                 child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
               ),
-              error: (err, stack) => SizedBox(
+              error: (err, stack) => const SizedBox(
                 height: 90,
-                child: Center(child: Text('خطأ في جلب البيانات: $err', style: const TextStyle(color: Colors.red))),
+                child: Center(child: Text('خطأ في جلب البيانات', style: TextStyle(color: Colors.red))),
               ),
               data: (categoriesList) {
                 if (categoriesList.isEmpty) {
@@ -138,7 +135,7 @@ class HomeBaseScreen extends ConsumerWidget {
                               backgroundColor: AppColors.primary.withOpacity(0.1),
                               child: Icon(_getIconData(category.iconName), color: AppColors.primary, size: 26),
                             ),
-                            const SizedBox(height: 😎,
+                            const SizedBox(height: 8),
                             Text(
                               category.name,
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
@@ -153,7 +150,7 @@ class HomeBaseScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // 3. أعلى المحترفين تقييماً (ستبقى تجريبية ضرك حتى ننشئ جدول المحترفين)
+            // 3. أعلى المحترفين تقييماً
             const Text(
               'أعلى المحترفين تقييماً',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimaryLight),
@@ -179,7 +176,7 @@ class HomeBaseScreen extends ConsumerWidget {
                           height: 70,
                           decoration: BoxDecoration(
                             color: AppColors.grey200,
-                            borderRadius: BorderRadius.circular(😎,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(Icons.construction, color: AppColors.grey600),
                         ),
@@ -194,14 +191,14 @@ class HomeBaseScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 4),
                               Row(
-                                children: [
-                                  const Icon(Icons.star, color: AppColors.warning, size: 16),
-                                  const SizedBox(width: 4),
+                                children: const [
+                                  Icon(Icons.star, color: AppColors.warning, size: 16),
+                                  SizedBox(width: 4),
                                   Text('4.9 (45 مراجعة)', style: TextStyle(fontSize: 12, color: AppColors.grey600)),
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              Text('السعر التقديري: 1500 دج/ساعة', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                              const Text('السعر التقديري: 1500 دج/ساعة', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600)),
                             ],
                           ),
                         ),
