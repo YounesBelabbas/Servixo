@@ -3,20 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_colors.dart';
 import 'home_base_screen.dart';
 import '../../services/presentation/services_screen.dart';
-import '../../wallet/presentation/wallet_screen.dart';
+import '../../bookings/presentation/bookings_list_screen.dart'; // شاشة الحجوزات المستقبيلة
 import '../../profile/presentation/profile_screen.dart';
 
-// بروفايدر بسيط لتتبع الشاشة الحالية المفتوحة
 final navigationIndexProvider = StateProvider<int>((ref) => 0);
 
 class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
-  // قائمة الشاشات المرتبطة بالتنقل
+  // قائمة الشاشات المحدثة للـ MVP (تعويض المحفظة بالحجوزات)
   final List<Widget> _screens = const [
     HomeBaseScreen(),
     ServicesScreen(),
-    WalletScreen(),
+    Scaffold(body: Center(child: Text('شاشة الحجوزات قيد التطوير'))), // مؤقتاً حتى نصل إليها
     ProfileScreen(),
   ];
 
@@ -52,9 +51,9 @@ class MainScreen extends ConsumerWidget {
             label: 'الخدمات',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            activeIcon: Icon(Icons.account_balance_wallet),
-            label: 'المحفظة',
+            icon: Icon(Icons.calendar_month_outlined),
+            activeIcon: Icon(Icons.calendar_month),
+            label: 'حجوزاتي',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
