@@ -6,51 +6,34 @@ class AuthRepository {
 
   AuthRepository(this._supabase);
 
-  // 1. دالة إنشاء حساب جديد (Email & Password)
-  Future<AuthResponse> signUpWithEmail({
+  // 1. تسجيل الدخول
+  Future<AuthResponse> signIn({required String email, required String password}) async {
+    return await _supabase.auth.signInWithPassword(email: email, password: password);
+  }
+
+  // 2. إنشاء حساب جديد (زبون أو حرفي)
+  Future<void> signUp({
     required String email,
     required String password,
     required String fullName,
+    required String userType, // 'customer' أو 'provider'
   }) async {
-    return await _supabase.auth.signUp(
-      email: email,
-      password: password,
-      data: {
+    final response = await _supabase.auth.signUp(email: email, password: password);
+    final userId = response.user?.id;
+
+    if (userId != null) {
+      // حفظ بيانات المستخدم الإضافية في جدول profiles داخل قاعدة البيانات
+      await _supabase.from('profiles').insert({
+        'id': userId,
+        'email': email,
         'full_name': fullName,
-      },
-    );
+        'user_type': userType,
+      });
+    }
   }
 
-  // 2. دالة تسجيل الدخول
-  Future<AuthResponse> signInWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    return await _supabase.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-  }
-
-  // 3. دالة تسجيل الخروج
+  // 3. تسجيل الخروج
   Future<void> signOut() async {
     await _supabase.auth.signOut();
   }
-
-  // 4. جلب بيانات ملف المستخدم الحالي من جدول الـ profiles
-  Future<UserModel?> getCurrentUserProfile() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) return null;
-
-    final data = await _supabase
-        .from('profiles')
-        .select()
-        .eq('id', user.id)
-        .single();
-
-    return UserModel.fromJson(data);
-  }
-
-  // 5. تتبع حالة المستخدم الحالية (مُسجل أو لا) بشكل حي ومباشر Stream
-  Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
 }
