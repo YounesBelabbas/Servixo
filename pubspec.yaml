@@ -44,6 +44,7 @@ dependencies:
 
   # UI Core (للضرورة والـ Splash)
   cupertino_icons: ^1.0.6
+  geolocator: ^14.0.2
 
 dev_dependencies:
   flutter_test:
